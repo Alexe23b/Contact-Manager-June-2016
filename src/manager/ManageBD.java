@@ -1,6 +1,6 @@
 package manager;
 
-import utils.connectionDB;
+import utils.ConnectionDB;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import static utils.choiceDB.choiceBD;
+import static utils.ChoiceDB.choiceBD;
 
 /**
  * Created by alexe on 28.06.2016.
@@ -26,7 +26,7 @@ public class ManageBD {
         nameBD = userName + "AddressBook";
         String query = "SELECT userName FROM users.user";
         try {
-            conn = connectionDB.getConnection(choiceBD(typeBD));
+            conn = ConnectionDB.getConnection(choiceBD(typeBD));
             stmt = conn.createStatement();
             rs = stmt.executeQuery(query);
 
@@ -108,7 +108,7 @@ public class ManageBD {
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         } finally {
-            connectionDB.closeConnection(conn);
+            ConnectionDB.closeConnection(conn);
             try {
                 stmt.close();
             } catch (SQLException se) { /*can't do anything */ }

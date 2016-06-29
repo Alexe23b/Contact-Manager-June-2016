@@ -6,7 +6,7 @@ import java.util.Properties;
 /**
  * Created by alexe on 28.06.2016.
  */
-public class connectionDB {
+public class ConnectionDB {
 
     private static Connection con;
 

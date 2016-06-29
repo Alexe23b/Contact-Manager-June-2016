@@ -2,12 +2,10 @@ package utils;
 
 import java.util.Properties;
 
-import static utils.connectionDB.getConnection;
-
 /**
  * Created by alexe on 28.06.2016.
  */
-public class choiceDB {
+public class ChoiceDB {
 
     public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
     public static final String MYSQL_URL_CONNECTION = "jdbc:mysql://localhost:3306";
