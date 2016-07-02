@@ -4,6 +4,7 @@ package controller;
 import java.util.Scanner;
 
 import static manager.ManageBD.checkUser;
+import static parse.JsonToMySQL.parseJson;
 
 //import static manager.ManageBD.createBD;
 
@@ -14,8 +15,7 @@ public class Controller {
 
     private static Scanner in;
     private static int typeBD;
-    private static String pathToParceFile;
-//    private static int versionBD;
+    //    private static int versionBD;
 
     public static void main(String[] args) throws Exception {
 
@@ -27,7 +27,9 @@ public class Controller {
 
         checkUser(userName, typeBD); //ManageDB
 
-        pathToParceFile = "files/" + userName+ "/contacts.json";
+        String pathToParseFile = "files/" + userName + "/contacts.json";
+
+        parseJson(pathToParseFile, typeBD, userName + "AddressBook");
 
 
     }

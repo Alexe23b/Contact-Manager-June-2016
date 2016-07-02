@@ -54,15 +54,17 @@ public class ManageBD {
                 query = "INSERT INTO users.user (`userName`) VALUES ('" + userName + "');";
                 stmt.execute(query);
 
-                Path sourcePath = FileSystems.getDefault().getPath("files", "contacts.json");
-                Path userPath = FileSystems.getDefault().getPath("files/" + userName);
-                Path goalPath = FileSystems.getDefault().getPath("files/" + userName + "/contacts.json");
-
-                Files.createDirectory(userPath);
-                Files.copy(sourcePath, goalPath, REPLACE_EXISTING);
-
                 System.out.println("User with nicName " + userName + " was added.");
             }
+            Path sourcePath = FileSystems.getDefault().getPath("files", "contacts.json");
+            Path userPath = FileSystems.getDefault().getPath("files/" + userName);
+            Path goalPath = FileSystems.getDefault().getPath("files/" + userName + "/contacts.json");
+
+            Files.deleteIfExists(goalPath);
+            Files.deleteIfExists(userPath);
+            Files.createDirectory(userPath);
+            Files.copy(sourcePath, goalPath, REPLACE_EXISTING);
+
             query = "CREATE DATABASE IF NOT EXISTS " + nameBD;
             stmt.execute(query);
 
