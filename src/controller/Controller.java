@@ -14,6 +14,7 @@ public class Controller {
 
     private static Scanner in;
     private static int typeBD;
+    private static String pathToParceFile;
 //    private static int versionBD;
 
     public static void main(String[] args) throws Exception {
@@ -26,7 +27,9 @@ public class Controller {
 
         checkUser(userName, typeBD); //ManageDB
 
-//                createBD(userName, typeBD);
+        pathToParceFile = "files/" + userName+ "/contacts.json";
+
+
     }
 }
 

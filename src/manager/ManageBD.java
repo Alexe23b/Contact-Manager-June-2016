@@ -2,12 +2,19 @@ package manager;
 
 import utils.ConnectionDB;
 
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static utils.ChoiceDB.choiceBD;
 
 /**
@@ -18,6 +25,7 @@ public class ManageBD {
 
     private static Connection conn;
     private static Statement stmt;
+    private static Statement pstmt;
     private static ResultSet rs;
     private static boolean check;
     private static String nameBD;
@@ -26,6 +34,7 @@ public class ManageBD {
         nameBD = userName + "AddressBook";
         String query = "SELECT userName FROM users.user";
         try {
+
             conn = ConnectionDB.getConnection(choiceBD(typeBD));
             stmt = conn.createStatement();
             rs = stmt.executeQuery(query);
@@ -44,6 +53,14 @@ public class ManageBD {
             if (check == true) {
                 query = "INSERT INTO users.user (`userName`) VALUES ('" + userName + "');";
                 stmt.execute(query);
+
+                Path sourcePath = FileSystems.getDefault().getPath("files", "contacts.json");
+                Path userPath = FileSystems.getDefault().getPath("files/" + userName);
+                Path goalPath = FileSystems.getDefault().getPath("files/" + userName + "/contacts.json");
+
+                Files.createDirectory(userPath);
+                Files.copy(sourcePath, goalPath, REPLACE_EXISTING);
+
                 System.out.println("User with nicName " + userName + " was added.");
             }
             query = "CREATE DATABASE IF NOT EXISTS " + nameBD;
@@ -107,6 +124,8 @@ public class ManageBD {
             System.out.println("Database for User " + userName + " was added.");
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             ConnectionDB.closeConnection(conn);
             try {
