@@ -2,7 +2,10 @@ package parse;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import sun.util.calendar.BaseCalendar;
+import sun.util.calendar.LocalGregorianCalendar;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +45,7 @@ public class Contact {
 
     @SerializedName("birthday")
     @Expose
-    private String birthday;
+    private LocalDate birthday;
 
     public String getUids() {
         return uids;
@@ -100,11 +103,11 @@ public class Contact {
         this.photoPath = photoPath;
     }
 
-    public String getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 }

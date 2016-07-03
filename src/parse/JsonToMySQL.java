@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,8 +36,9 @@ public class JsonToMySQL {
             for (Contact contact : contacts) {
                 Address address = contact.getAddress();
 
-                String address_record = "INSERT INTO "+ nameBD +".address (`country`, `city`, `street`, `house_number`, `house_suffix`, `appartment`, `post_code`) VALUES"
-                        + "(?, ?, ?, ?, ?, ?, ?);";
+                String address_record = "INSERT INTO " + nameBD + ".address (`country`, `city`, `street`, " +
+                        "`house_number`, `house_suffix`, `appartment`, `post_code`) VALUES" +
+                        "(?, ?, ?, ?, ?, ?, ?);";
 
                 prepStat = con.prepareStatement(address_record);
 
@@ -50,22 +52,38 @@ public class JsonToMySQL {
 
                 prepStat.executeUpdate();
 
-                System.out.println("Uids = " + contact.getUids());
-                System.out.println("First Name = " + contact.getFirstName());
-                System.out.println("Last Name = " + contact.getLastName());
-                System.out.println("Address:");
-                System.out.println("Country = " + address.getCountry());
-                System.out.println("City = " + address.getCity());
-                System.out.println("Street = " + address.getStreet());
-                System.out.println("House Number = " + address.getHouseNumber());
-                System.out.println("House Suffix = " + address.getHouseSuffix());
-                System.out.println("Apartment = " + address.getApartment());
-                System.out.println("Post Code = " + address.getPostCode());
-                System.out.println("Phones = " + contact.getPhones());
-                System.out.println("Emails = " + contact.getEmails());
-                System.out.println("Photo Path = " + contact.getPhotoPath());
-                System.out.println("Birthday = " + contact.getBirthday());
-                System.out.println("----------------------------------------");
+                long idAdr = ((com.mysql.jdbc.Statement) prepStat).getLastInsertID();
+                String idAddress = String.valueOf(idAdr);
+
+                String contact_record = "INSERT INTO " + nameBD + ".contacts (`user_firstName`, `user_lastName`, " +
+                        "`birthday`, `address_id`)" +
+                        "VALUES (?, ?, ?, ?);";
+
+                prepStat = con.prepareStatement(contact_record);
+
+                prepStat.setString(1, contact.getFirstName());
+                prepStat.setString(2, contact.getLastName());
+                prepStat.setDate(3, Date.valueOf(contact.getBirthday()));
+                prepStat.setString(4, idAddress);
+
+                prepStat.executeUpdate();
+
+//                System.out.println("Uids = " + contact.getUids());
+//                System.out.println("First Name = " + contact.getFirstName());
+//                System.out.println("Last Name = " + contact.getLastName());
+//                System.out.println("Address:");
+//                System.out.println("Country = " + address.getCountry());
+//                System.out.println("City = " + address.getCity());
+//                System.out.println("Street = " + address.getStreet());
+//                System.out.println("House Number = " + address.getHouseNumber());
+//                System.out.println("House Suffix = " + address.getHouseSuffix());
+//                System.out.println("Apartment = " + address.getApartment());
+//                System.out.println("Post Code = " + address.getPostCode());
+//                System.out.println("Phones = " + contact.getPhones());
+//                System.out.println("Emails = " + contact.getEmails());
+//                System.out.println("Photo Path = " + contact.getPhotoPath());
+//                System.out.println("Birthday = " + contact.getBirthday());
+//                System.out.println("----------------------------------------");
             }
         } catch (SQLException e) {
             e.printStackTrace();

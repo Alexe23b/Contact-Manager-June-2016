@@ -25,36 +25,48 @@ public class ManageBD {
 
     private static Connection conn;
     private static Statement stmt;
-    private static Statement pstmt;
     private static ResultSet rs;
-    private static boolean check;
-    private static String nameBD;
 
     public static void checkUser(String userName, int typeBD) {
-        nameBD = userName + "AddressBook";
-        String query = "SELECT userName FROM users.user";
+        String nameBD = userName + "AddressBook";
+        String query;
         try {
 
             conn = ConnectionDB.getConnection(choiceBD(typeBD));
             stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
 
+
+            query = "CREATE DATABASE IF NOT EXISTS users";
+            stmt.executeUpdate(query);
+
+            query = "CREATE TABLE IF NOT EXISTS users.user("
+                    + "user_id INT NOT NULL AUTO_INCREMENT,"
+                    + "user_name VARCHAR(45) NOT NULL,"
+                    + "user_password VARCHAR(45),"
+                    + "PRIMARY KEY (user_id)"
+                    + ")";
+            stmt.execute(query);
+
+            query = "SELECT user_name FROM users.user";
+            rs = stmt.executeQuery(query);
             while (rs.next()) {
                 users.add(rs.getString(1));
             }
-            check = true;
+            boolean check = true;
             for (String user : users) {
                 if (user.equals(userName)) {
                     System.out.println("User with nicName " + userName + " was found.");
+                    System.out.println("-------------------------------------");
                     check = false;
                     break;
                 }
             }
             if (check == true) {
-                query = "INSERT INTO users.user (`userName`) VALUES ('" + userName + "');";
+                query = "INSERT INTO users.user (`user_name`) VALUES ('" + userName + "');";
                 stmt.execute(query);
 
                 System.out.println("User with nicName " + userName + " was added.");
+                System.out.println("-------------------------------------");
             }
             Path sourcePath = FileSystems.getDefault().getPath("files", "contacts.json");
             Path userPath = FileSystems.getDefault().getPath("files/" + userName);
@@ -82,7 +94,7 @@ public class ManageBD {
                     + ")";
             stmt.execute(query);
 
-            query = "CREATE TABLE IF NOT EXISTS " + nameBD + ".contact("
+            query = "CREATE TABLE IF NOT EXISTS " + nameBD + ".contacts("
                     + "user_id INT NOT NULL AUTO_INCREMENT,"
                     + "user_firstName VARCHAR(30) NOT NULL,"
                     + "user_lastName VARCHAR(20) NOT NULL,"
@@ -100,7 +112,7 @@ public class ManageBD {
                     + "email VARCHAR(100) NOT NULL,"
                     + "user_id INTEGER NOT NULL,"
                     + "PRIMARY KEY (email_id),"
-                    + "FOREIGN KEY (user_id) REFERENCES " + nameBD + ".contact (user_id)"
+                    + "FOREIGN KEY (user_id) REFERENCES " + nameBD + ".contacts (user_id)"
                     + "ON DELETE CASCADE ON UPDATE CASCADE"
                     + ")";
             stmt.execute(query);
@@ -116,7 +128,7 @@ public class ManageBD {
                     + "user_id INTEGER NOT NULL,"
                     + "phone_number_id INTEGER NOT NULL,"
                     + "PRIMARY KEY (user_id, phone_number_id),"
-                    + "FOREIGN KEY (user_id) REFERENCES " + nameBD + ".contact(user_id)"
+                    + "FOREIGN KEY (user_id) REFERENCES " + nameBD + ".contacts(user_id)"
                     + "ON DELETE CASCADE ON UPDATE CASCADE,"
                     + "FOREIGN KEY (phone_number_id) REFERENCES " + nameBD + ".phones(phone_number_id)"
                     + "ON DELETE CASCADE ON UPDATE CASCADE"
@@ -124,6 +136,7 @@ public class ManageBD {
             stmt.execute(query);
 
             System.out.println("Database for User " + userName + " was added.");
+            System.out.println("-------------------------------------");
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         } catch (IOException e) {
