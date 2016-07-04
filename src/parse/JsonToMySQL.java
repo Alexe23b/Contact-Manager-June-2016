@@ -2,23 +2,20 @@ package parse;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import utils.ChoiceDB;
+import utils.ConnectionDB;
 
-import java.awt.*;
-import java.beans.Statement;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static utils.ChoiceDB.choiceBD;
+import static utils.ConnectionDB.closeConnection;
 import static utils.ConnectionDB.getConnection;
 
 /**
@@ -30,10 +27,13 @@ public class JsonToMySQL {
     public static void parseJson(String path, int typeBD, String nameBD) throws IOException {
 
         List<Contact> contacts = readJsonStream(new FileInputStream(path));
-        PreparedStatement prepStat;
+
+        Connection con = null;
+        PreparedStatement prepStat = null;
+
 
         try {
-            Connection con = getConnection(choiceBD(typeBD)); // 1 typeBD - MySQL
+            con = getConnection(choiceBD(typeBD));
 
             for (Contact contact : contacts) {
                 Address address = contact.getAddress();
@@ -65,39 +65,57 @@ public class JsonToMySQL {
 
                 prepStat.setString(1, contact.getFirstName());
                 prepStat.setString(2, contact.getLastName());
+
                 java.util.Date input = contact.getBirthday();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String date = dateFormat.format(input);
-//                java.util.Date date = null;
-//                try {
-//                    date = format.parse(input);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
+
                 prepStat.setString(3, date);
                 prepStat.setString(4, idAddress);
 
                 prepStat.executeUpdate();
 
-//                System.out.println("Uids = " + contact.getUids());
-//                System.out.println("First Name = " + contact.getFirstName());
-//                System.out.println("Last Name = " + contact.getLastName());
-//                System.out.println("Address:");
-//                System.out.println("Country = " + address.getCountry());
-//                System.out.println("City = " + address.getCity());
-//                System.out.println("Street = " + address.getStreet());
-//                System.out.println("House Number = " + address.getHouseNumber());
-//                System.out.println("House Suffix = " + address.getHouseSuffix());
-//                System.out.println("Apartment = " + address.getApartment());
-//                System.out.println("Post Code = " + address.getPostCode());
-//                System.out.println("Phones = " + contact.getPhones());
-//                System.out.println("Emails = " + contact.getEmails());
-//                System.out.println("Photo Path = " + contact.getPhotoPath());
-//                System.out.println("Birthday = " + contact.getBirthday());
-//                System.out.println("----------------------------------------");
+                long idCont = ((com.mysql.jdbc.Statement) prepStat).getLastInsertID();
+                String idContact = String.valueOf(idCont);
+
+                for (String phone : contact.getPhones()) {
+
+                    String phone_record = "INSERT INTO " + nameBD + ".phones (`phone_number`) VALUES (?);";
+
+                    prepStat = con.prepareStatement(phone_record);
+                    prepStat.setString(1, phone);
+                    prepStat.executeUpdate();
+
+                    long idPhon = ((com.mysql.jdbc.Statement) prepStat).getLastInsertID();
+                    String idPhone = String.valueOf(idPhon);
+
+                    String phonetocontact_record = "INSERT INTO " + nameBD + ".contact_phone VALUES (?, ?);";
+
+                    prepStat = con.prepareStatement(phonetocontact_record);
+                    prepStat.setString(1, idContact);
+                    prepStat.setString(2, idPhone);
+
+                    prepStat.executeUpdate();
+                }
+                for (String email : contact.getEmails()) {
+                    String email_record = "INSERT INTO " + nameBD + ".emails (`email`,`user_id`) VALUES (?, ?);";
+
+                    prepStat = con.prepareStatement(email_record);
+                    prepStat.setString(1, email);
+                    prepStat.setString(2, idContact);
+
+                    prepStat.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection(con);
+            try {
+                prepStat.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
