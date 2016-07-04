@@ -7,6 +7,7 @@ import sun.util.calendar.LocalGregorianCalendar;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public class Contact {
 
     @SerializedName("birthday")
     @Expose
-    private LocalDate birthday;
+    private Date birthday;
 
     public String getUids() {
         return uids;
@@ -103,11 +104,11 @@ public class Contact {
         this.photoPath = photoPath;
     }
 
-    public LocalDate getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 }

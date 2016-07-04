@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +65,16 @@ public class JsonToMySQL {
 
                 prepStat.setString(1, contact.getFirstName());
                 prepStat.setString(2, contact.getLastName());
-                prepStat.setDate(3, Date.valueOf(contact.getBirthday()));
+                java.util.Date input = contact.getBirthday();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String date = dateFormat.format(input);
+//                java.util.Date date = null;
+//                try {
+//                    date = format.parse(input);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+                prepStat.setString(3, date);
                 prepStat.setString(4, idAddress);
 
                 prepStat.executeUpdate();
