@@ -76,7 +76,6 @@ public class ManageBD {
             File[] listFiles = FileNameFilter.findFiles("files", "json");
 
             for (File f : listFiles) {
-                System.out.println("Файл: " + f.getName());
 
                 Path sourcePath = FileSystems.getDefault().getPath("files", f.getName());
                 Path goalPath = FileSystems.getDefault().getPath("files/" + userName, f.getName());

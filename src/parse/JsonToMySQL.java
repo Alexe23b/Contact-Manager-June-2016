@@ -21,10 +21,21 @@ import static utils.ConnectionDB.getConnection;
 /**
  * Created by alexe on 10.06.2016.
  */
-public class JsonToMySQL {
-    private static Gson gson = new Gson();
+public class JsonToMySQL implements Runnable {
 
-    public static void parseJson(String path, int typeBD, String nameBD) throws IOException {
+
+    private static Gson gson = new Gson();
+    public String path;
+    public int typeBD;
+    public String nameBD;
+
+    public JsonToMySQL(String path, int typeBD, String nameBD) {
+        this.path = path;
+        this.typeBD = typeBD;
+        this.nameBD = nameBD;
+    }
+
+    public void parseJson(String path, int typeBD, String nameBD) throws IOException {
 
         List<Contact> contacts = readJsonStream(new FileInputStream(path));
 
@@ -134,5 +145,14 @@ public class JsonToMySQL {
         reader.close();
 
         return contacts;
+    }
+
+    @Override
+    public void run() {
+        try {
+            parseJson(path, typeBD, nameBD);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

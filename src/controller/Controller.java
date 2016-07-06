@@ -8,8 +8,8 @@ import utils.FileNameFilter;
 import java.io.File;
 import java.util.Scanner;
 
-import static manager.ManageBD.checkUser;
-import static parse.JsonToMySQL.parseJson;
+//import static manager.ManageBD.checkUser;
+//import static parse.JsonToMySQL.parseJson;
 
 //import static manager.ManageBD.createBD;
 
@@ -20,7 +20,7 @@ public class Controller {
 
     private static Scanner in;
     private static int typeBD;
-    //    private static int versionBD;
+    static JsonToMySQL parser;
 
     public static void main(String[] args) throws Exception {
 
@@ -36,9 +36,19 @@ public class Controller {
 
         for (File f : listFiles) {
 
+
+
             String pathToParseFile = "files/" + userName + "/" + f.getName();
-            System.out.println(pathToParseFile);
-            JsonToMySQL.parseJson(pathToParseFile, typeBD, userName + "AddressBook");
+
+            parser = new JsonToMySQL(pathToParseFile, typeBD, userName + "AddressBook");
+
+//            System.out.println(pathToParseFile);
+//            JsonToMySQL.parseJson(pathToParseFile, typeBD, userName + "AddressBook");
+
+            Thread thread = new Thread(parser);
+            thread.start();
+            System.out.println("Parsing was started: " + pathToParseFile);
+
         }
 
     }
