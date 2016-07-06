@@ -1,6 +1,7 @@
 package manager;
 
 import utils.ConnectionDB;
+import utils.FileNameFilter;
 
 
 import java.io.File;
@@ -68,15 +69,22 @@ public class ManageBD {
                 System.out.println("User with nicName " + userName + " was added.");
                 System.out.println("-------------------------------------");
             }
-            Path sourcePath = FileSystems.getDefault().getPath("files", "contacts.json");
             Path userPath = FileSystems.getDefault().getPath("files/" + userName);
-            Path goalPath = FileSystems.getDefault().getPath("files/" + userName + "/contacts.json");
-
-            Files.deleteIfExists(goalPath);
             Files.deleteIfExists(userPath);
             Files.createDirectory(userPath);
-            Files.copy(sourcePath, goalPath, REPLACE_EXISTING);
 
+            File[] listFiles = FileNameFilter.findFiles("files", "json");
+
+            for (File f : listFiles) {
+                System.out.println("Файл: " + f.getName());
+
+                Path sourcePath = FileSystems.getDefault().getPath("files", f.getName());
+                Path goalPath = FileSystems.getDefault().getPath("files/" + userName, f.getName());
+
+                Files.deleteIfExists(goalPath);
+
+                Files.copy(sourcePath, goalPath, REPLACE_EXISTING);
+            }
             query = "CREATE DATABASE IF NOT EXISTS " + nameBD;
             stmt.execute(query);
 

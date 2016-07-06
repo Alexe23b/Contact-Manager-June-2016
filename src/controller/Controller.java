@@ -1,6 +1,11 @@
 package controller;
 
 
+import manager.ManageBD;
+import parse.JsonToMySQL;
+import utils.FileNameFilter;
+
+import java.io.File;
 import java.util.Scanner;
 
 import static manager.ManageBD.checkUser;
@@ -25,12 +30,16 @@ public class Controller {
 
         typeBD = 1; // mySQL or 2 PostGrey
 
-        checkUser(userName, typeBD); //ManageDB
+        ManageBD.checkUser(userName, typeBD);
 
-        String pathToParseFile = "files/" + userName + "/contacts.json";
+        File[] listFiles = FileNameFilter.findFiles("files/" + userName, "json");
 
-        parseJson(pathToParseFile, typeBD, userName + "AddressBook");
+        for (File f : listFiles) {
 
+            String pathToParseFile = "files/" + userName + "/" + f.getName();
+            System.out.println(pathToParseFile);
+            JsonToMySQL.parseJson(pathToParseFile, typeBD, userName + "AddressBook");
+        }
 
     }
 }
