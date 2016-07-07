@@ -1,17 +1,12 @@
-package parse;
+package DataBaseWork;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import utils.ConnectionDB;
+import parse.Address;
+import parse.Contact;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import static utils.ChoiceDB.choiceBD;
@@ -19,29 +14,13 @@ import static utils.ConnectionDB.closeConnection;
 import static utils.ConnectionDB.getConnection;
 
 /**
- * Created by alexe on 10.06.2016.
+ * Created by alexe on 07.07.2016.
  */
-public class JsonToMySQL implements Runnable {
+public class JavaToDB {
+    static Connection con = null;
+    static PreparedStatement prepStat = null;
 
-
-    private static Gson gson = new Gson();
-    public String path;
-    public int typeBD;
-    public String nameBD;
-
-    public JsonToMySQL(String path, int typeBD, String nameBD) {
-        this.path = path;
-        this.typeBD = typeBD;
-        this.nameBD = nameBD;
-    }
-
-    public void parseJson(String path, int typeBD, String nameBD) throws IOException {
-
-        List<Contact> contacts = readJsonStream(new FileInputStream(path));
-
-        Connection con = null;
-        PreparedStatement prepStat = null;
-
+    public static void JavaToDB(int typeBD, String nameBD, List<Contact> contacts) {
 
         try {
             con = getConnection(choiceBD(typeBD));
@@ -127,32 +106,6 @@ public class JsonToMySQL implements Runnable {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private static List<Contact> readJsonStream(FileInputStream in) throws IOException {
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-
-        List<Contact> contacts = new ArrayList<>();
-
-
-        reader.beginArray();
-        while (reader.hasNext()) {
-            Contact contact = gson.fromJson(reader, Contact.class);
-            contacts.add(contact);
-        }
-        reader.endArray();
-        reader.close();
-
-        return contacts;
-    }
-
-    @Override
-    public void run() {
-        try {
-            parseJson(path, typeBD, nameBD);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

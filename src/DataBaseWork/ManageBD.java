@@ -1,4 +1,4 @@
-package manager;
+package DataBaseWork;
 
 import utils.ConnectionDB;
 import utils.FileNameFilter;
@@ -29,7 +29,7 @@ public class ManageBD {
     private static ResultSet rs;
 
     public static void checkUser(String userName, int typeBD) {
-        String nameBD = userName + "AddressBook";
+        String nameBD = userName + "_AddressBook";
         String query;
         try {
 
