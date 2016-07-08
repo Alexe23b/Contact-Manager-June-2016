@@ -2,6 +2,7 @@ package parse;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import controller.Controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class JsonToJava implements Runnable {
     public JsonToJava(String path) {
         this.path = path;
     }
+
 
 //    public void parseJson(String path) throws IOException {
 //
