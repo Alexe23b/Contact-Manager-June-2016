@@ -3,38 +3,28 @@ package controller;
 
 import DataBaseWork.JavaToDB;
 import DataBaseWork.ManageBD;
-import parse.Contact;
 import parse.JsonToJava;
 import utils.FileNameFilter;
-import utils.ThrowsBuffer;
+import utils.ThreadsBuffer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-//import static DataBaseWork.ManageBD.checkUser;
-//import static parse.JsonToJava.parseJson;
-
-//import static DataBaseWork.ManageBD.createBD;
-
 /**
  * Created by alexe on 28.06.2016.
  */
 public class Controller {
 
-    private static Scanner in;
-    private static int typeBD;
-    static JsonToJava parser;
-    static JavaToDB writer;
 
     public static void main(String[] args) throws Exception {
 
-        in = new Scanner(System.in);
+        Scanner in = new Scanner(System.in);
         System.out.println("Input user NicName:");
         String userName = in.nextLine();
 
-        typeBD = 1; // mySQL or 2 PostGrey
+        int typeBD = 1;
 
         ManageBD.checkUser(userName, typeBD);
 
@@ -47,29 +37,38 @@ public class Controller {
 //            contactsAll.addAll(contacts);
 //        }
 
-        ThrowsBuffer buffer = new ThrowsBuffer();
-
+        ThreadsBuffer buffer = new ThreadsBuffer();
+        List<Thread> threadsReader = new ArrayList<>();
+        int i = 0;
         for (File f : listFiles) {
-
+            i++;
             String pathToParseFile = "files/" + userName + "/" + f.getName();
-
-            parser = new JsonToJava(pathToParseFile, buffer);
-
+            JsonToJava parser = new JsonToJava(pathToParseFile, buffer);
             Thread threadReader = new Thread(parser);
+            threadsReader.add(threadReader);
             threadReader.start();
-            System.out.println("Thread-Reader " + pathToParseFile + "  was started.");
+            System.out.println("Thread-Reader " + i + " was started.");
         }
-
         String nameBD = userName + "_AddressBook";
-        writer = new JavaToDB(typeBD, nameBD, buffer);
+        JavaToDB writer = new JavaToDB(typeBD, nameBD, buffer);
         Thread threadWriter = new Thread(writer);
-        System.out.println("Thread-Writer  was started.");
+        System.out.println("-------------------------------");
+        System.out.println("Thread-Writer was started.");
+        System.out.println("-------------------------------");
         threadWriter.start();
 
-
-
-//        JavaToDB.JavaToDB(typeBD,  userName + "_AddressBook", contactsAll);
+        for (Thread thread : threadsReader) {
+            thread.join();
+        }
+//        Thread myThread = Thread.currentThread();
+//        myThread.sleep(5000);
+        threadWriter.interrupt();
+//        threadWriter.start();
+//        threadWriter.interrupt();
+        System.out.println("-------------------------------");
+        System.out.println("ФСЕ ЗАШИБИСЬ!!!!");
     }
+
 }
 
 

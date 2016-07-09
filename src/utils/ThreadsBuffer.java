@@ -5,7 +5,7 @@ import parse.Contact;
 /**
  * Created by alexe on 08.07.2016.
  */
-public class ThrowsBuffer {
+public class ThreadsBuffer {
     private Contact contact = null;
 
     public synchronized void put(Contact newContact) throws InterruptedException {
@@ -18,6 +18,7 @@ public class ThrowsBuffer {
     }
 
     public synchronized Contact get() throws InterruptedException {
+
         while (contact == null) {
             this.wait();
         }

@@ -2,13 +2,11 @@ package parse;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import controller.Controller;
-import utils.ThrowsBuffer;
+import utils.ThreadsBuffer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +18,9 @@ public class JsonToJava implements Runnable {
 
     private static Gson gson = new Gson();
     private String path;
-    private final ThrowsBuffer buffer;
+    private final ThreadsBuffer buffer;
 
-    public JsonToJava(String path, ThrowsBuffer buffer) {
+    public JsonToJava(String path, ThreadsBuffer buffer) {
         this.path = path;
         this.buffer = buffer;
     }
@@ -34,24 +32,24 @@ public class JsonToJava implements Runnable {
 //
 //    }
 
-    public static List<Contact> readJson(String path) throws IOException {
+//    public static List<Contact> readJson(String path) throws IOException {
+//
+//        JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
+//
+//        List<Contact> contacts = new ArrayList<>();
+//
+//        reader.beginArray();
+//        while (reader.hasNext()) {
+//            Contact contact = gson.fromJson(reader, Contact.class);
+//            contacts.add(contact);
+//        }
+//        reader.endArray();
+//        reader.close();
+//
+//        return contacts;
+//    }
 
-        JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
-
-        List<Contact> contacts = new ArrayList<>();
-
-        reader.beginArray();
-        while (reader.hasNext()) {
-            Contact contact = gson.fromJson(reader, Contact.class);
-            contacts.add(contact);
-        }
-        reader.endArray();
-        reader.close();
-
-        return contacts;
-    }
-
-    public void parseJson() throws IOException {
+    private void parseJson() throws IOException {
 
         JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
 
@@ -70,9 +68,15 @@ public class JsonToJava implements Runnable {
 
     @Override
     public void run() {
+        Thread myThread = Thread.currentThread();
         try {
             parseJson();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            myThread.sleep(200);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
