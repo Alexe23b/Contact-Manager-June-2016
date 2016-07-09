@@ -3,6 +3,7 @@ package parse;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import controller.Controller;
+import utils.ThrowsBuffer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,10 +19,12 @@ public class JsonToJava implements Runnable {
 
 
     private static Gson gson = new Gson();
-    public String path;
+    private String path;
+    private final ThrowsBuffer buffer;
 
-    public JsonToJava(String path) {
+    public JsonToJava(String path, ThrowsBuffer buffer) {
         this.path = path;
+        this.buffer = buffer;
     }
 
 
@@ -48,10 +51,27 @@ public class JsonToJava implements Runnable {
         return contacts;
     }
 
+    public void parseJson() throws IOException {
+
+        JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
+
+        reader.beginArray();
+        while (reader.hasNext()) {
+            Contact contact = gson.fromJson(reader, Contact.class);
+            try {
+                buffer.put(contact);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        reader.endArray();
+        reader.close();
+    }
+
     @Override
     public void run() {
         try {
-            readJson(path);
+            parseJson();
         } catch (IOException e) {
             e.printStackTrace();
         }

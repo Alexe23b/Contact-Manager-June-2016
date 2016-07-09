@@ -6,6 +6,7 @@ import DataBaseWork.ManageBD;
 import parse.Contact;
 import parse.JsonToJava;
 import utils.FileNameFilter;
+import utils.ThrowsBuffer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Controller {
     private static Scanner in;
     private static int typeBD;
     static JsonToJava parser;
+    static JavaToDB writer;
 
     public static void main(String[] args) throws Exception {
 
@@ -38,25 +40,35 @@ public class Controller {
 
         File[] listFiles = FileNameFilter.findFiles("files/" + userName, "json");
 
+//        List<Contact> contactsAll = new ArrayList<>();
 //        for (File f : listFiles) {
-//
 //            String pathToParseFile = "files/" + userName + "/" + f.getName();
-//
-//            parser = new JsonToJava(pathToParseFile);
-//
-//            Thread thread = new Thread(parser);
-//            thread.start();
-//            System.out.println("Parsing was started: " + pathToParseFile);
-//
+//            List<Contact> contacts = JsonToJava.readJson(pathToParseFile);
+//            contactsAll.addAll(contacts);
 //        }
-        List<Contact> contactsAll = new ArrayList<>();
+
+        ThrowsBuffer buffer = new ThrowsBuffer();
+
         for (File f : listFiles) {
+
             String pathToParseFile = "files/" + userName + "/" + f.getName();
-            List<Contact> contacts = JsonToJava.readJson(pathToParseFile);
-            contactsAll.addAll(contacts);
+
+            parser = new JsonToJava(pathToParseFile, buffer);
+
+            Thread threadReader = new Thread(parser);
+            threadReader.start();
+            System.out.println("Thread-Reader " + pathToParseFile + "  was started.");
         }
 
-        JavaToDB.JavaToDB(typeBD,  userName + "_AddressBook", contactsAll);
+        String nameBD = userName + "_AddressBook";
+        writer = new JavaToDB(typeBD, nameBD, buffer);
+        Thread threadWriter = new Thread(writer);
+        System.out.println("Thread-Writer  was started.");
+        threadWriter.start();
+
+
+
+//        JavaToDB.JavaToDB(typeBD,  userName + "_AddressBook", contactsAll);
     }
 }
 
